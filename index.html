@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公司内部任务系统</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- ==================== 登录/注册页面 ==================== -->
+    <div id="auth-page" class="auth-page">
+        <div class="auth-card">
+            <div class="auth-header">
+                <span class="material-icons" style="font-size: 48px; color: #1976d2;">business</span>
+                <h1>公司任务系统</h1>
+            </div>
+
+            <!-- 角色选择 -->
+            <div id="role-select" class="role-select">
+                <p>请选择您的身份</p>
+                <div class="role-buttons">
+                    <button class="role-btn" data-role="boss">
+                        <span class="material-icons">admin_panel_settings</span>
+                        <span>老板/管理员</span>
+                    </button>
+                    <button class="role-btn" data-role="employee">
+                        <span class="material-icons">person</span>
+                        <span>员工</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 老板登录表单 -->
+            <div id="boss-login-form" class="auth-form" style="display: none;">
+                <h3>管理员登录</h3>
+                <div class="form-group">
+                    <label>管理员密码</label>
+                    <input type="password" id="boss-password" placeholder="请输入管理员密码">
+                </div>
+                <button class="btn btn-primary btn-full" id="boss-login-btn">
+                    <span class="material-icons">login</span>
+                    进入管理后台
+                </button>
+                <button class="btn btn-text" id="back-to-role">
+                    <span class="material-icons">arrow_back</span>
+                    返回选择身份
+                </button>
+            </div>
+
+            <!-- 员工登录/注册表单 -->
+            <div id="employee-auth-form" class="auth-form" style="display: none;">
+                <div class="auth-tabs">
+                    <button class="tab-btn active" data-tab="login">登录</button>
+                    <button class="tab-btn" data-tab="register">注册账号</button>
+                </div>
+
+                <!-- 登录 -->
+                <div id="login-tab" class="tab-content">
+                    <div class="form-group">
+                        <label>账号</label>
+                        <input type="text" id="employee-username" placeholder="请输入账号">
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <input type="password" id="employee-password" placeholder="请输入密码">
+                    </div>
+                    <button class="btn btn-primary btn-full" id="employee-login-btn">
+                        <span class="material-icons">login</span>
+                        登录
+                    </button>
+                </div>
+
+                <!-- 注册 -->
+                <div id="register-tab" class="tab-content" style="display: none;">
+                    <div class="form-group">
+                        <label>姓名</label>
+                        <input type="text" id="register-name" placeholder="请输入您的姓名">
+                    </div>
+                    <div class="form-group">
+                        <label>账号</label>
+                        <input type="text" id="register-username" placeholder="设置账号（字母数字下划线）">
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <input type="password" id="register-password" placeholder="设置密码">
+                    </div>
+                    <div class="form-group">
+                        <label>确认密码</label>
+                        <input type="password" id="register-password-confirm" placeholder="再次输入密码">
+                    </div>
+                    <button class="btn btn-primary btn-full" id="employee-register-btn">
+                        <span class="material-icons">person_add</span>
+                        注册
+                    </button>
+                </div>
+
+                <button class="btn btn-text" id="back-to-role-2">
+                    <span class="material-icons">arrow_back</span>
+                    返回选择身份
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 老板界面 ==================== -->
+    <div id="boss-app" class="app-container" style="display: none;">
+        <!-- 顶部导航 -->
+        <nav class="navbar navbar-boss">
+            <div class="nav-brand">
+                <span class="material-icons">admin_panel_settings</span>
+                <span>管理后台</span>
+            </div>
+            <div class="nav-actions">
+                <div class="sync-indicator" id="boss-sync-indicator">
+                    <span class="material-icons">sync</span>
+                    <span>实时监听中</span>
+                </div>
+                <button class="btn btn-primary" id="boss-add-task-btn">
+                    <span class="material-icons">add</span>
+                    发布任务
+                </button>
+                <button class="btn btn-icon" id="boss-logout-btn" title="退出登录">
+                    <span class="material-icons">logout</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- 统计概览 -->
+        <div class="stats-bar">
+            <div class="stat-card">
+                <span class="material-icons">people</span>
+                <div class="stat-info">
+                    <span class="stat-value" id="stat-employees">0</span>
+                    <span class="stat-label">员工总数</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <span class="material-icons">assignment</span>
+                <div class="stat-info">
+                    <span class="stat-value" id="stat-total">0</span>
+                    <span class="stat-label">任务总数</span>
+                </div>
+            </div>
+            <div class="stat-card stat-success">
+                <span class="material-icons">check_circle</span>
+                <div class="stat-info">
+                    <span class="stat-value" id="stat-completed">0</span>
+                    <span class="stat-label">已完成</span>
+                </div>
+            </div>
+            <div class="stat-card stat-danger">
+                <span class="material-icons">pending</span>
+                <div class="stat-info">
+                    <span class="stat-value" id="stat-pending">0</span>
+                    <span class="stat-label">未完成</span>
+                </div>
+            </div>
+            <div class="stat-card stat-overdue">
+                <span class="material-icons">warning</span>
+                <div class="stat-info">
+                    <span class="stat-value" id="stat-overdue">0</span>
+                    <span class="stat-label">已逾期</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="boss-main">
+            <!-- 左侧：员工列表 -->
+            <aside class="employee-panel">
+                <div class="panel-header">
+                    <h3><span class="material-icons">people</span> 公司成员</h3>
+                    <span class="employee-count" id="employee-count">0 人</span>
+                </div>
+                <div class="employee-list" id="employee-list"></div>
+            </aside>
+
+            <!-- 右侧：任务概览 -->
+            <main class="task-panel">
+                <div class="panel-header">
+                    <h3><span class="material-icons">assignment</span> 任务概览</h3>
+                    <div class="filter-group">
+                        <select id="boss-filter-employee">
+                            <option value="all">全部员工</option>
+                        </select>
+                        <select id="boss-filter-status">
+                            <option value="all">全部状态</option>
+                            <option value="pending">未完成</option>
+                            <option value="completed">已完成</option>
+                            <option value="overdue">已逾期</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="boss-task-list" id="boss-task-list"></div>
+                <div class="empty-state" id="boss-empty-state" style="display: none;">
+                    <span class="material-icons">task_alt</span>
+                    <p>暂无任务</p>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- ==================== 员工界面 ==================== -->
+    <div id="employee-app" class="app-container" style="display: none;">
+        <!-- 顶部导航 -->
+        <nav class="navbar navbar-employee">
+            <div class="nav-brand">
+                <span class="material-icons">person</span>
+                <span id="employee-welcome">员工工作台</span>
+            </div>
+            <div class="nav-actions">
+                <span class="task-count" id="employee-task-count">0 个任务</span>
+                <button class="btn btn-icon" id="employee-logout-btn" title="退出登录">
+                    <span class="material-icons">logout</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- 任务列表 -->
+        <main class="main-content">
+            <div class="employee-task-list" id="employee-task-list"></div>
+            <div class="empty-state" id="employee-empty-state" style="display: none;">
+                <span class="material-icons">task_alt</span>
+                <p>暂无指派给您的任务</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- ==================== 发布任务模态框 ==================== -->
+    <div class="modal" id="create-task-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>发布新任务</h2>
+                <button class="btn-close" id="create-modal-close">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <form id="task-form">
+                <div class="form-group">
+                    <label>任务标题 *</label>
+                    <input type="text" id="task-title" required placeholder="输入任务标题">
+                </div>
+                <div class="form-group">
+                    <label>任务描述</label>
+                    <textarea id="task-description" placeholder="详细描述任务内容"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>优先级</label>
+                        <select id="task-priority">
+                            <option value="low">普通</option>
+                            <option value="medium">重要</option>
+                            <option value="high">紧急</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>验收截止时间 *</label>
+                        <input type="datetime-local" id="task-deadline" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>指派员工 *</label>
+                    <select id="task-assignee" required>
+                        <option value="">请选择员工</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="create-cancel-btn">取消</button>
+                    <button type="submit" class="btn btn-primary">发布任务</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== 任务详情模态框 ==================== -->
+    <div class="modal" id="task-detail-modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2 id="detail-modal-title">任务详情</h2>
+                <button class="btn-close" id="detail-modal-close">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <div class="modal-body" id="detail-modal-body"></div>
+        </div>
+    </div>
+
+    <!-- ==================== 通知容器 ==================== -->
+    <div id="notification-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

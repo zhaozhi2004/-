@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: task-mongo
+    restart: always
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - task-network
+
+  api:
+    image: node:18-alpine
+    container_name: task-api
+    restart: always
+    working_dir: /app
+    volumes:
+      - ./server.js:/app/server.js
+      - ./package.json:/app/package.json
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/tasks
+    command: sh -c "cd /app && npm install && node server.js"
+    depends_on:
+      - mongo
+    networks:
+      - task-network
+
+  web:
+    image: nginx:alpine
+    container_name: task-web
+    restart: always
+    volumes:
+      - ./task-reminder-simple.html:/usr/share/nginx/html/index.html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    networks:
+      - task-network
+
+networks:
+  task-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
